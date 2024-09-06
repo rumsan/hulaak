@@ -1,0 +1,26 @@
+{
+  "name": "hulaak",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/hulaak/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "hulaak:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "hulaak:build:development"
+        },
+        "production": {
+          "buildTarget": "hulaak:build:production"
+        }
+      }
+    }
+  }
+}
