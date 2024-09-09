@@ -13,12 +13,14 @@ export class InboxService {
   async findByAddress(address: string): Promise<Email[]> {
     return this.prisma.email.findMany({
       where: { address },
+      orderBy: { date: 'desc' },
     });
   }
 
   async findByDomain(domain: string): Promise<Email[]> {
     return this.prisma.email.findMany({
       where: { domain },
+      orderBy: { date: 'desc' },
     });
   }
 

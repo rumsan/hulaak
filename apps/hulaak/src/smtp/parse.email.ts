@@ -6,5 +6,11 @@ export const parseEmail = async (email: SMTPServerDataStream) => {
   const to = parsed?.to as AddressObject;
   const addresses = to.value.map((email) => email.address);
 
-  return { parsed, addresses, subject: parsed.subject, date: parsed.date };
+  return {
+    parsed,
+    addresses,
+    subject: parsed.subject,
+    from: parsed.from?.value?.[0]?.address,
+    date: parsed.date,
+  };
 };

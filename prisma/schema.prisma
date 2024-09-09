@@ -13,6 +13,7 @@ model Email {
   mailbox   String
   domain    String?
   mailCuid  String
+  from      String?
   subject   String?
   date      DateTime
 

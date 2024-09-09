@@ -5,6 +5,7 @@ CREATE TABLE "tbl_emails" (
     "mailbox" TEXT NOT NULL,
     "domain" TEXT,
     "mailCuid" TEXT NOT NULL,
+    "from" TEXT,
     "subject" TEXT,
     "date" DATETIME NOT NULL
 );
