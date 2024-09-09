@@ -11,7 +11,8 @@ import {
 } from 'smtp-server';
 import { DomainService } from '../settings/domain.service';
 import { extractEmailAddress } from '../utils/email.utils';
-import { parseEmail } from './parse.email';
+import { parseEmail } from '../utils/parse.email';
+import { WebsocketService } from './websocket.service';
 
 @Injectable()
 export class SmtpService implements OnModuleInit {
@@ -21,7 +22,8 @@ export class SmtpService implements OnModuleInit {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly domainService: DomainService
+    private readonly domainService: DomainService,
+    private readonly ws: WebsocketService
   ) {}
 
   onModuleInit() {
@@ -67,17 +69,19 @@ export class SmtpService implements OnModuleInit {
           .then(async ({ addresses, subject, date, from }) => {
             for (const address of addresses) {
               const email = extractEmailAddress(address);
+              const data = {
+                mailCuid,
+                address,
+                mailbox: email?.mailbox || '',
+                domain: email?.domain || '',
+                from,
+                subject,
+                date,
+              };
               await this.prisma.email.create({
-                data: {
-                  mailCuid,
-                  address,
-                  mailbox: email?.mailbox || '',
-                  domain: email?.domain || '',
-                  from,
-                  subject,
-                  date,
-                },
+                data,
               });
+              this.ws.broadcast('new-email', data);
               this.logger.log(`Email received: ${address} - ${mailCuid}`);
             }
             callback();
