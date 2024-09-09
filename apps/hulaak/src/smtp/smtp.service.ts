@@ -42,6 +42,8 @@ export class SmtpService implements OnModuleInit {
         const approvedDomains = await this.domainService.list();
         if (approvedDomains.includes(senderDomain)) {
           callback();
+        } else if (approvedDomains.includes('*')) {
+          callback();
         } else {
           callback(
             new Error(`Email rejected: Unapproved domain [${senderDomain}]`)

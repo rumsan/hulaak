@@ -10,6 +10,9 @@ export class DomainService {
   async add(domains: string[]) {
     let allDomains: string[] = (await this.settings.get('domains')) || [];
     allDomains = [...new Set([...allDomains, ...domains])];
+    if (allDomains.includes('*')) {
+      allDomains = ['*'];
+    }
     return this.settings.save('domains', allDomains, false);
   }
 
@@ -19,8 +22,11 @@ export class DomainService {
   }
 
   async remove(domains: string[]) {
+    if (domains.includes('*')) {
+      return this.settings.save('domains', [], false);
+    }
     let allDomains: string[] = (await this.settings.get('domains')) || [];
     allDomains = allDomains.filter((domain) => !domains.includes(domain));
-    return this.settings.save('domains', allDomains);
+    return this.settings.save('domains', allDomains, false);
   }
 }
