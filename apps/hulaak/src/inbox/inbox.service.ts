@@ -31,6 +31,13 @@ export class InboxService {
     return simpleParser(email);
   }
 
+  async getRawEmail(mailCuid: string) {
+    const rawEmailFilePath = path.join(this.emailDir, `${mailCuid}.eml`);
+    const email = fs.readFileSync(rawEmailFilePath, 'utf8');
+
+    return email;
+  }
+
   countAll(): Promise<number> {
     return this.prisma.email.count();
   }

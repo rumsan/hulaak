@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
 import { InboxService } from './inbox.service';
 
 @Controller('inbox')
@@ -26,7 +26,10 @@ export class InboxController {
   }
 
   @Get('email/:cuid')
-  GetOne(@Param('cuid') cuid: string) {
+  GetOne(@Param('cuid') cuid: string, @Query('raw') raw: boolean) {
+    if (raw) {
+      return this.emailService.getRawEmail(cuid);
+    }
     return this.emailService.findByEmailCuid(cuid);
   }
 

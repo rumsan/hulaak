@@ -1,0 +1,29 @@
+meta {
+  name: Get Raw Email
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{url}}/inbox/email/{{email-cuid}}?raw=true
+  body: none
+  auth: none
+}
+
+params:query {
+  raw: true
+}
+
+body:json {
+  {
+    "a": 1
+  }
+}
+
+tests {
+  var data = res.getBody().data;
+  
+  if(data){
+    bru.setVar("settings-name", data.name);
+  }
+}
