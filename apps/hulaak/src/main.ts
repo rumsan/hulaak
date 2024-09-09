@@ -47,22 +47,21 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
 
-  if (process.env.NODE_ENV !== 'production') {
-    const config = new DocumentBuilder()
-      .setTitle('Rumsan Hulaak')
-      .setDescription('Get disposable email addresses like Mailinator service.')
-      .setVersion('1.0')
-      .addBearerAuth(
-        { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
-        'JWT'
-      )
-      .build();
+  //if (process.env.NODE_ENV !== 'production') {
+  const config = new DocumentBuilder()
+    .setTitle('Rumsan Hulaak')
+    .setDescription('Get disposable email addresses like Mailinator service.')
+    .setVersion('1.0')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'JWT'
+    )
+    .build();
 
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('/', app, document);
-  }
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('/', app, document);
+  //}
 
-  await app.startAllMicroservices();
   await app.listen(port);
   Logger.log(
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
