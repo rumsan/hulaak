@@ -1,0 +1,17 @@
+meta {
+  name: Delete All
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{url}}/inbox
+  body: none
+  auth: none
+}
+
+body:json {
+  {
+    "a": 1
+  }
+}

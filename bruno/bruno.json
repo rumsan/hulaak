@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Rumsan Hulaak",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

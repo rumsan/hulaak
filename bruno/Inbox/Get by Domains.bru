@@ -1,0 +1,25 @@
+meta {
+  name: Get by Domains
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{url}}/inbox/domains/rumsan.com
+  body: none
+  auth: none
+}
+
+body:json {
+  {
+    "a": 1
+  }
+}
+
+tests {
+  var data = res.getBody().data;
+  
+  if(data?.length){
+    bru.setVar("email-cuid", data?.[0].mailCuid);
+  }
+}

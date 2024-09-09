@@ -1,0 +1,15 @@
+meta {
+  name: Domains - Delete
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{url}}/settings/domains
+  body: json
+  auth: none
+}
+
+body:json {
+  ["rumsan.com"]
+}

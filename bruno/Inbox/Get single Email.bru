@@ -1,0 +1,25 @@
+meta {
+  name: Get single Email
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/inbox/email/{{email-cuid}}
+  body: none
+  auth: none
+}
+
+body:json {
+  {
+    "a": 1
+  }
+}
+
+tests {
+  var data = res.getBody().data;
+  
+  if(data){
+    bru.setVar("settings-name", data.name);
+  }
+}

@@ -1,0 +1,17 @@
+meta {
+  name: Delete by Domains
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{url}}/inbox/domains/example.com
+  body: none
+  auth: none
+}
+
+body:json {
+  {
+    "a": 1
+  }
+}

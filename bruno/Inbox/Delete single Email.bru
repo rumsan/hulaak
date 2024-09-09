@@ -1,0 +1,17 @@
+meta {
+  name: Delete single Email
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{url}}/inbox/email/{{email-cuid}}
+  body: none
+  auth: none
+}
+
+body:json {
+  {
+    "a": 1
+  }
+}

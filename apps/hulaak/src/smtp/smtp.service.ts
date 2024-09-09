@@ -1,13 +1,28 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { SMTPServer } from 'smtp-server';
-import { simpleParser, ParsedMail } from 'mailparser';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { createId } from '@paralleldrive/cuid2';
+import { PrismaService } from '@rumsan/prisma';
 import * as fs from 'fs';
 import * as path from 'path';
+import {
+  SMTPServer,
+  SMTPServerAddress,
+  SMTPServerDataStream,
+  SMTPServerSession,
+} from 'smtp-server';
+import { DomainService } from '../settings/domain.service';
+import { extractEmailAddress } from '../utils/email.utils';
+import { parseEmail } from './parse.email';
 
 @Injectable()
 export class SmtpService implements OnModuleInit {
+  private readonly logger = new Logger(SmtpService.name);
   private server: SMTPServer;
   private emailDir = path.join('.data', 'emails');
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly domainService: DomainService
+  ) {}
 
   onModuleInit() {
     this.startSmtpServer();
@@ -16,56 +31,68 @@ export class SmtpService implements OnModuleInit {
   private startSmtpServer() {
     this.server = new SMTPServer({
       disabledCommands: ['AUTH', 'STARTTLS'], // Disable authentication and TLS
-      onData: (stream, session, callback) => {
-        this.parseEmail(stream)
-          .then((parsed) => {
-            // Ensure .data directory and emails subfolder exist
-            this.ensureDirectoryExists(this.emailDir);
 
-            // Safely handle parsed.to (ensure it's an array)
-            const toRecipients = Array.isArray(parsed.to)
-              ? parsed.to.map((recipient) => recipient.text)
-              : parsed.to?.text
-              ? [parsed.to.text]
-              : [];
+      // Reject unapproved domains
+      onMailFrom: async (
+        address: SMTPServerAddress,
+        session: SMTPServerSession,
+        callback: (err?: Error | null) => void
+      ) => {
+        const senderDomain = address.address.split('@')[1];
+        const approvedDomains = await this.domainService.list();
+        if (approvedDomains.includes(senderDomain)) {
+          callback();
+        } else {
+          callback(
+            new Error(`Email rejected: Unapproved domain [${senderDomain}]`)
+          );
+        }
+      },
 
-            // Extract headers, body, and other details
-            const emailData = {
-              ID: `${Date.now()}_email`, // Custom ID
-              From: parsed.from?.text,
-              To: toRecipients,
-              Subject: parsed.subject,
-              Date: parsed.date,
-              Headers: parsed.headers,
-              Body: parsed.text, // Plain text version of the email body
-              HtmlBody: parsed.html, // HTML version of the email body
-              Raw: {
-                From: parsed.from?.text,
-                To: toRecipients,
-                Data: parsed.textAsHtml, // Raw text as HTML
-                Helo: session.helo, // Session Helo information
-              },
-            };
+      // Handle the incoming email data stream
+      onData: (
+        stream: SMTPServerDataStream,
+        session: SMTPServerSession,
+        callback
+      ) => {
+        const mailCuid = createId();
+        const rawEmailFilePath = path.join(this.emailDir, `${mailCuid}.eml`);
+        this.ensureDirectoryExists(this.emailDir);
+        const writeStream = fs.createWriteStream(rawEmailFilePath);
+        stream.pipe(writeStream);
 
-            // Save email as JSON
-            const emailFilePath = path.join(
-              this.emailDir,
-              `${Date.now()}_email.json`
-            );
-            fs.writeFileSync(emailFilePath, JSON.stringify(emailData, null, 2));
-            console.log('Email saved:', emailFilePath);
-
+        parseEmail(stream)
+          .then(async ({ addresses, subject, date }) => {
+            for (const address of addresses) {
+              const email = extractEmailAddress(address);
+              await this.prisma.email.create({
+                data: {
+                  mailCuid,
+                  address,
+                  mailbox: email?.mailbox || '',
+                  domain: email?.domain || '',
+                  subject,
+                  date,
+                },
+              });
+              this.logger.log(`Email received: ${address} - ${mailCuid}`);
+            }
             callback();
           })
           .catch((err) => {
             console.error('Error parsing email:', err);
             callback(err);
           });
+
+        writeStream.on('error', (err) => {
+          console.error('Error writing raw email stream:', err);
+          callback(err);
+        });
       },
     });
 
     this.server.listen(25, '0.0.0.0', () => {
-      console.log('SMTP Server listening on port 25 without TLS');
+      this.logger.log('SMTP Server listening on port 25 without TLS');
     });
   }
 
@@ -74,17 +101,5 @@ export class SmtpService implements OnModuleInit {
       fs.mkdirSync(dir, { recursive: true });
       console.log('Directory created:', dir);
     }
-  }
-
-  async parseEmail(stream): Promise<ParsedMail> {
-    return new Promise((resolve, reject) => {
-      simpleParser(stream, (err, parsed) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(parsed);
-        }
-      });
-    });
   }
 }

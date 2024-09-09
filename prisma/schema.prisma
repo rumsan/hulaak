@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Email {
+  id        Int       @id @default(autoincrement())
+  address   String
+  mailbox   String
+  domain    String?
+  mailCuid  String
+  subject   String?
+  date      DateTime
+
+  @@map("tbl_emails")
+}
+
+model Setting {
+  name           String          @id @unique
+  value          String
+  isReadOnly     Boolean         @default(false)
+  isPrivate      Boolean         @default(true)
+
+  @@map("tbl_settings")
+} 

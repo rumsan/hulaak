@@ -1,0 +1,15 @@
+meta {
+  name: Domains - Create
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{url}}/settings/domains
+  body: json
+  auth: none
+}
+
+body:json {
+  ["example.com"]
+}

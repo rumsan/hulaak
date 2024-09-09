@@ -1,0 +1,17 @@
+meta {
+  name: Get Total Count
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{url}}/inbox
+  body: none
+  auth: none
+}
+
+body:json {
+  {
+    "a": 1
+  }
+}

@@ -1,0 +1,17 @@
+meta {
+  name: Delete by Address
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{url}}/inbox/santosh@rumsan.com
+  body: none
+  auth: none
+}
+
+body:json {
+  {
+    "a": 1
+  }
+}
