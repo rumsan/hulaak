@@ -9,8 +9,10 @@ import {
 } from '@nestjs/common';
 import { DomainService } from './domain.service';
 import { SettingsService } from './settings.service';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('settings')
+@ApiTags('settings')
 export class SettingsController {
   private readonly logger = new Logger(SettingsController.name);
 

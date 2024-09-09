@@ -1,7 +1,9 @@
 import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
 import { InboxService } from './inbox.service';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('inbox')
+@ApiTags('inbox')
 export class InboxController {
   constructor(private readonly emailService: InboxService) {}
 
