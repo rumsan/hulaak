@@ -12,5 +12,6 @@ export const parseEmail = async (email: SMTPServerDataStream) => {
     subject: parsed.subject,
     from: parsed.from?.value?.[0]?.address,
     date: parsed.date,
+    text: parsed.text,
   };
 };

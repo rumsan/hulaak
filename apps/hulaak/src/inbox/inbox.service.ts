@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Email } from '@prisma/client';
 import { PrismaService } from '@rumsan/prisma';
 import fs from 'fs';
-import { simpleParser } from 'mailparser';
 import path from 'path';
 
 @Injectable()
@@ -22,20 +21,6 @@ export class InboxService {
       where: { domain },
       orderBy: { date: 'desc' },
     });
-  }
-
-  async findByEmailCuid(mailCuid: string) {
-    const rawEmailFilePath = path.join(this.emailDir, `${mailCuid}.eml`);
-    const email = fs.readFileSync(rawEmailFilePath, 'utf8');
-
-    return simpleParser(email);
-  }
-
-  async getRawEmail(mailCuid: string) {
-    const rawEmailFilePath = path.join(this.emailDir, `${mailCuid}.eml`);
-    const email = fs.readFileSync(rawEmailFilePath, 'utf8');
-
-    return email;
   }
 
   countAll(): Promise<number> {

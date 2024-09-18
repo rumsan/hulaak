@@ -66,10 +66,11 @@ export class SmtpService implements OnModuleInit {
         stream.pipe(writeStream);
 
         parseEmail(stream)
-          .then(async ({ addresses, subject, date, from }) => {
+          .then(async ({ addresses, subject, date, from, text }) => {
             for (const address of addresses) {
               const email = extractEmailAddress(address);
               const data = {
+                id: createId(),
                 mailCuid,
                 address,
                 mailbox: email?.mailbox || '',
@@ -77,6 +78,7 @@ export class SmtpService implements OnModuleInit {
                 from,
                 subject,
                 date,
+                text,
               };
               await this.prisma.email.create({
                 data,

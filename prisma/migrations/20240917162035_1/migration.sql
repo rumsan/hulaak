@@ -1,13 +1,15 @@
 -- CreateTable
 CREATE TABLE "tbl_emails" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" TEXT NOT NULL PRIMARY KEY,
     "address" TEXT NOT NULL,
     "mailbox" TEXT NOT NULL,
     "domain" TEXT,
     "mailCuid" TEXT NOT NULL,
     "from" TEXT,
     "subject" TEXT,
-    "date" DATETIME NOT NULL
+    "date" DATETIME NOT NULL,
+    "read" BOOLEAN NOT NULL DEFAULT false,
+    "text" TEXT
 );
 
 -- CreateTable

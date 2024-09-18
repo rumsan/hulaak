@@ -5,48 +5,35 @@ import { ApiTags } from '@nestjs/swagger';
 @Controller('inbox')
 @ApiTags('inbox')
 export class InboxController {
-  constructor(private readonly emailService: InboxService) {}
+  constructor(private readonly inbox: InboxService) {}
 
   @Get()
   countAll() {
-    return this.emailService.countAll();
+    return this.inbox.countAll();
   }
 
   @Delete()
   removeAll() {
-    return this.emailService.removeAll();
+    return this.inbox.removeAll();
   }
 
   @Get('domains/:domain')
   findByDomain(@Param('domain') domain: string) {
-    return this.emailService.findByDomain(domain);
+    return this.inbox.findByDomain(domain);
   }
 
   @Delete('domains/:domain')
   removeByDomain(@Param('domain') domain: string) {
-    return this.emailService.removeByDomain(domain);
-  }
-
-  @Get('email/:cuid')
-  GetOne(@Param('cuid') cuid: string, @Query('raw') raw: boolean) {
-    if (raw) {
-      return this.emailService.getRawEmail(cuid);
-    }
-    return this.emailService.findByEmailCuid(cuid);
-  }
-
-  @Delete('email/:cuid')
-  remove(@Param('cuid') cuid: string) {
-    return this.emailService.removeByEmailCuid(cuid);
+    return this.inbox.removeByDomain(domain);
   }
 
   @Get(':address')
   findByAddress(@Param('address') address: string) {
-    return this.emailService.findByAddress(address);
+    return this.inbox.findByAddress(address);
   }
 
   @Delete(':address')
   removeByAddress(@Param('address') address: string) {
-    return this.emailService.removeByAddress(address);
+    return this.inbox.removeByAddress(address);
   }
 }
