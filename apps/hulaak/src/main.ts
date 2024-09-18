@@ -23,7 +23,7 @@ async function bootstrap() {
       instance: loggerInstance,
     }),
   });
-  const globalPrefix = 'api/v1';
+  const globalPrefix = 'v1';
   app.enableCors();
 
   // app.use(bodyParser.raw({ type: 'application/octet-stream' }));
