@@ -83,6 +83,19 @@ export class SmtpService implements OnModuleInit {
               await this.prisma.email.create({
                 data,
               });
+
+              await this.prisma.log.create({
+                data: {
+                  id: data.id,
+                  mailbox: data.mailbox,
+                  domain: data.domain,
+                  from: data.from,
+                  subject: data.subject,
+                  text: data.text,
+                  date: data.date,
+                },
+              });
+
               this.ws.broadcast('new-email', data);
               this.logger.log(`Email received: ${address} - ${mailCuid}`);
             }

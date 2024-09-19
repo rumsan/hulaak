@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgres" //can be "mysql" or "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -20,6 +20,18 @@ model Email {
   text      String?
 
   @@map("tbl_emails")
+}
+
+model Log {
+  id        String       @id @default(cuid())
+  mailbox   String
+  domain    String?
+  from      String?
+  subject   String?
+  text      String?
+  date      DateTime
+
+  @@map("tbl_logs")
 }
 
 model Setting {
