@@ -91,7 +91,6 @@ export class SmtpService implements OnModuleInit {
                   domain: data.domain,
                   from: data.from,
                   subject: data.subject,
-                  text: data.text,
                   date: data.date,
                 },
               });
