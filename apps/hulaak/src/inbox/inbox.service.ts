@@ -13,6 +13,7 @@ export class InboxService {
     return this.prisma.email.findMany({
       where: { address },
       orderBy: { date: 'desc' },
+      take: 30,
     });
   }
 
@@ -20,6 +21,7 @@ export class InboxService {
     return this.prisma.email.findMany({
       where: { domain },
       orderBy: { date: 'desc' },
+      take: 30,
     });
   }
 
