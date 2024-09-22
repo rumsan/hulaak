@@ -65,6 +65,14 @@ export class InboxService {
       fs.unlinkSync(path.join(this.emailDir, file));
     });
 
+    this.prisma.log
+      .deleteMany({
+        where: {
+          read: false,
+        },
+      })
+      .then();
+
     return this.prisma.email.deleteMany({});
   }
 }

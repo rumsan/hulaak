@@ -19,9 +19,11 @@ CREATE TABLE "tbl_logs" (
     "id" TEXT NOT NULL,
     "mailbox" TEXT NOT NULL,
     "domain" TEXT,
+    "mailCuid" TEXT NOT NULL,
     "from" TEXT,
     "subject" TEXT,
     "text" TEXT,
+    "read" BOOLEAN NOT NULL DEFAULT false,
     "date" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "tbl_logs_pkey" PRIMARY KEY ("id")

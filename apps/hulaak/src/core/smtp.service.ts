@@ -89,8 +89,10 @@ export class SmtpService implements OnModuleInit {
                   id: data.id,
                   mailbox: data.mailbox,
                   domain: data.domain,
+                  mailCuid: data.mailCuid,
                   from: data.from,
                   subject: data.subject,
+                  text: data.text,
                   date: data.date,
                 },
               });

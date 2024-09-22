@@ -26,9 +26,12 @@ model Log {
   id        String       @id @default(cuid())
   mailbox   String
   domain    String?
+  
+  mailCuid  String
   from      String?
   subject   String?
   text      String?
+  read      Boolean   @default(false)
   date      DateTime
 
   @@map("tbl_logs")

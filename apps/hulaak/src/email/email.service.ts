@@ -40,10 +40,27 @@ export class EmailService {
   }
 
   async markReadById(id: string) {
-    return this.prisma.email.update({
-      where: { id },
-      data: { read: true },
+    const email = await this.prisma.email.update({
+      where: {
+        id,
+      },
+      data: {
+        read: true,
+      },
     });
+
+    this.prisma.log
+      .updateMany({
+        where: {
+          id,
+        },
+        data: {
+          read: true,
+        },
+      })
+      .then();
+
+    return email;
   }
 
   async removeById(id: string): Promise<{ count: number }> {
