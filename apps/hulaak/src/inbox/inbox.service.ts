@@ -30,8 +30,10 @@ export class InboxService {
   }
 
   async removeByEmailCuid(mailCuid: string): Promise<{ count: number }> {
-    const rawEmailFilePath = path.join(this.emailDir, `${mailCuid}.eml`);
-    fs.unlinkSync(rawEmailFilePath);
+    try {
+      const rawEmailFilePath = path.join(this.emailDir, `${mailCuid}.eml`);
+      fs.unlinkSync(rawEmailFilePath);
+    } catch (e) {}
 
     return this.prisma.email.deleteMany({
       where: { mailCuid },
@@ -60,11 +62,7 @@ export class InboxService {
     return { count: emails.length };
   }
 
-  removeAll(): Promise<{ count: number }> {
-    fs.readdirSync(this.emailDir).forEach((file) => {
-      fs.unlinkSync(path.join(this.emailDir, file));
-    });
-
+  async removeBulk(filter: 'unread' | 'all'): Promise<{ count: number }> {
     this.prisma.log
       .deleteMany({
         where: {
@@ -73,6 +71,21 @@ export class InboxService {
       })
       .then();
 
-    return this.prisma.email.deleteMany({});
+    if (filter === 'all') {
+      fs.readdirSync(this.emailDir).forEach((file) => {
+        fs.unlinkSync(path.join(this.emailDir, file));
+      });
+
+      return this.prisma.email.deleteMany({});
+    } else if (filter === 'unread') {
+      const emails = await this.prisma.email.findMany({
+        where: { read: false },
+      });
+      emails.forEach((email) => {
+        this.removeByEmailCuid(email.mailCuid);
+      });
+
+      return { count: emails.length };
+    }
   }
 }

@@ -1,4 +1,11 @@
-import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { InboxService } from './inbox.service';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -13,8 +20,14 @@ export class InboxController {
   }
 
   @Delete()
-  removeAll() {
-    return this.inbox.removeAll();
+  removeAll(@Query('filter') filter: 'unread' | 'all') {
+    if (filter !== 'unread' && filter !== 'all') {
+      throw new BadRequestException(
+        `Invalid filter: ${filter}. Allowed filters are 'unread' or 'all'.`
+      );
+    }
+
+    return this.inbox.removeBulk(filter);
   }
 
   @Get('domains/:domain')

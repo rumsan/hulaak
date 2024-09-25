@@ -1,13 +1,17 @@
 meta {
-  name: Delete All
+  name: Delete in Bulk
   type: http
   seq: 8
 }
 
 delete {
-  url: {{url}}/inbox
+  url: {{url}}/inbox?filter=unread
   body: none
   auth: none
+}
+
+params:query {
+  filter: unread
 }
 
 body:json {
