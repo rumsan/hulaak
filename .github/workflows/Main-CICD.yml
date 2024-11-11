@@ -1,0 +1,52 @@
+name: Main CI/CD
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+  workflow_dispatch:
+
+env:
+  CI: false
+
+jobs:
+  deploy:
+    name: build && push image to Docker hub
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20.10.0
+
+      - name: install dependencies and build apps
+        run: |
+          npm install -g pnpm@8.14.1 only-allow
+          pnpm install
+          pnpm prisma:generate
+          pnpm build:all
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: docker login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # hulaak Image
+      - name: build && push hulaak
+        id: build-push-hulaak
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.hulaak
+          cache-from: type=gha,scope=hulaak
+          cache-to: type=gha,mode=max,scope=hulaak
+          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          tags: rumsan/hulaak:main
