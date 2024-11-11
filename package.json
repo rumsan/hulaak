@@ -2,7 +2,13 @@
   "name": "rumsan-hulaak",
   "version": "0.1.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "dev": "nx serve raman",
+    "build:all": "nx run-many --target=build --all",
+    "clean": "rm -rf dist node_modules tmp",
+    "seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
+    "prisma:generate": "npx prisma generate"
+  },
   "private": true,
   "dependencies": {
     "@nestjs/common": "^10.0.2",
