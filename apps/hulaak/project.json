@@ -5,13 +5,38 @@
   "projectType": "application",
   "tags": [],
   "targets": {
+    "build": {
+      "dependsOn": ["mainBuild"],
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "cp -r prisma/ dist/apps/hulaak/prisma && node apps/hulaak/modify-package.js"
+        ]
+      }
+    },
+    "mainBuild": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "generatePackageJson": true,
+        "outputPath": "dist/apps/hulaak",
+        "main": "apps/hulaak/src/main.ts",
+        "tsConfig": "apps/hulaak/tsconfig.app.json",
+        "assets": [],
+        "webpackConfig": "apps/hulaak/webpack.config.js"
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
     "serve": {
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
-      "dependsOn": ["build"],
       "options": {
-        "buildTarget": "hulaak:build",
-        "runBuildTargetDependencies": false
+        "buildTarget": "hulaak:build"
       },
       "configurations": {
         "development": {
