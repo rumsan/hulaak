@@ -4,10 +4,14 @@
 dist
 tmp
 .data
-.env
 .npmrc
 play
 /out-tsc
+
+# ENV
+.env
+.env.*
+!.env.example
 
 # dependencies
 node_modules
@@ -48,3 +52,6 @@ Thumbs.db
 # Next.js
 .next
 out
+
+# Docker compose file
+docker-compose.yaml
