@@ -1,17 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { createId } from '@paralleldrive/cuid2';
 import { Email } from '@prisma/client';
 import { PrismaService } from '@rumsan/prisma';
 import fs from 'fs';
 import path from 'path';
+import { WebsocketService } from '../core/websocket.service';
+import { DomainService } from '../settings/domain.service';
+import { extractEmailAddress } from '../utils/email.utils';
+import { CreateMailDto } from './dtos/create-mail.dto';
 
 @Injectable()
 export class InboxService {
+  private readonly logger = new Logger(InboxService.name);
   private emailDir = path.join('.data', 'emails');
-  constructor(private prisma: PrismaService) {}
+
+  constructor(
+    private prisma: PrismaService,
+    private readonly domainService: DomainService,
+    private readonly ws: WebsocketService,
+  ) {}
 
   async findByAddress(address: string): Promise<Email[]> {
+    const email = extractEmailAddress(address);
     return this.prisma.email.findMany({
-      where: { address },
+      where: { mailbox: email?.mailbox, domain: email?.domain },
       orderBy: { date: 'desc' },
       take: 30,
     });
@@ -33,7 +45,9 @@ export class InboxService {
     try {
       const rawEmailFilePath = path.join(this.emailDir, `${mailCuid}.eml`);
       fs.unlinkSync(rawEmailFilePath);
-    } catch (e) {}
+    } catch (e) {
+      this.logger.error(`Error deleting email file: ${mailCuid}`);
+    }
 
     return this.prisma.email.deleteMany({
       where: { mailCuid },
@@ -86,6 +100,65 @@ export class InboxService {
       });
 
       return { count: emails.length };
+    }
+  }
+
+  async createEmail(dto: CreateMailDto) {
+    const { date, from, to, subject, html, text, raw } = dto;
+    const addresses = to.split(',').map((address) => address.trim());
+
+    console.log('Email received:', subject);
+
+    const mailCuid = createId();
+    const rawEmailFilePath = path.join(this.emailDir, `${mailCuid}.eml`);
+    this.ensureDirectoryExists(this.emailDir);
+    fs.writeFileSync(rawEmailFilePath, raw);
+
+    for (const address of addresses) {
+      const email = extractEmailAddress(address);
+      //filter domains
+      const approvedDomains = await this.domainService.list();
+      if (approvedDomains.includes(email?.domain)) {
+        const data = {
+          id: createId(),
+          mailCuid,
+          address,
+          mailbox: email?.mailbox || '',
+          domain: email?.domain || '',
+          from,
+          subject,
+          date,
+          text,
+          html,
+        };
+        await this.prisma.email.create({
+          data,
+        });
+
+        await this.prisma.log.create({
+          data: {
+            id: data.id,
+            mailbox: data.mailbox,
+            domain: data.domain,
+            mailCuid: data.mailCuid,
+            from: data.from,
+            subject: data.subject,
+            text: data.text,
+            date: data.date,
+          },
+        });
+
+        this.ws.broadcast('new-email', data);
+        this.logger.log(`Email received: ${address} - ${mailCuid}`);
+      }
+    }
+    return addresses;
+  }
+
+  private ensureDirectoryExists(dir: string) {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      console.log('Directory created:', dir);
     }
   }
 }

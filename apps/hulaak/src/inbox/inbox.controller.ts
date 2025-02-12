@@ -1,13 +1,16 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
   Param,
+  Put,
   Query,
 } from '@nestjs/common';
-import { InboxService } from './inbox.service';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateMailDto } from './dtos/create-mail.dto';
+import { InboxService } from './inbox.service';
 
 @Controller('inbox')
 @ApiTags('inbox')
@@ -19,11 +22,16 @@ export class InboxController {
     return this.inbox.countAll();
   }
 
+  @Put()
+  createEmail(@Body() createMailDto: CreateMailDto) {
+    return this.inbox.createEmail(createMailDto);
+  }
+
   @Delete()
   removeAll(@Query('filter') filter: 'unread' | 'all') {
     if (filter !== 'unread' && filter !== 'all') {
       throw new BadRequestException(
-        `Invalid filter: ${filter}. Allowed filters are 'unread' or 'all'.`
+        `Invalid filter: ${filter}. Allowed filters are 'unread' or 'all'.`,
       );
     }
 

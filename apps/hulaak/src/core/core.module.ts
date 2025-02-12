@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { WebsocketService } from './websocket.service';
-import { SmtpService } from './smtp.service';
 import { SettingsModule } from '../settings/settings.module';
+import { WebsocketService } from './websocket.service';
 
 @Module({
   imports: [SettingsModule],
-  providers: [WebsocketService, SmtpService],
-  exports: [WebsocketService, SmtpService],
+  providers: [WebsocketService],
+  exports: [WebsocketService],
 })
 export class CoreModule {}

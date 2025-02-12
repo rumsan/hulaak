@@ -8,40 +8,41 @@ datasource db {
 }
 
 model Email {
-  id        String       @id @default(cuid())
-  address   String
-  mailbox   String
-  domain    String?
-  mailCuid  String
-  from      String?
-  subject   String?
-  date      DateTime
-  read      Boolean   @default(false)
-  text      String?
+  id       String   @id @default(cuid())
+  address  String
+  mailbox  String
+  domain   String?
+  mailCuid String
+  from     String?
+  subject  String?
+  date     DateTime
+  read     Boolean  @default(false)
+  text     String?
+  html     String?
 
   @@map("tbl_emails")
 }
 
 model Log {
-  id        String       @id @default(cuid())
-  mailbox   String
-  domain    String?
-  
-  mailCuid  String
-  from      String?
-  subject   String?
-  text      String?
-  read      Boolean   @default(false)
-  date      DateTime
+  id      String  @id @default(cuid())
+  mailbox String
+  domain  String?
+
+  mailCuid String
+  from     String?
+  subject  String?
+  text     String?
+  read     Boolean  @default(false)
+  date     DateTime
 
   @@map("tbl_logs")
 }
 
 model Setting {
-  name           String          @id @unique
-  value          String
-  isReadOnly     Boolean         @default(false)
-  isPrivate      Boolean         @default(true)
+  name       String  @id @unique
+  value      String
+  isReadOnly Boolean @default(false)
+  isPrivate  Boolean @default(true)
 
   @@map("tbl_settings")
-} 
+}

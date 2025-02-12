@@ -10,6 +10,7 @@ CREATE TABLE "tbl_emails" (
     "date" TIMESTAMP(3) NOT NULL,
     "read" BOOLEAN NOT NULL DEFAULT false,
     "text" TEXT,
+    "html" TEXT,
 
     CONSTRAINT "tbl_emails_pkey" PRIMARY KEY ("id")
 );
