@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
-    "dev": "nx serve raman",
+    "dev": "nx serve hulaak",
     "build:all": "nx run-many --target=build --all",
     "clean": "rm -rf dist node_modules tmp",
     "seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
